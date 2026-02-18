@@ -11,7 +11,10 @@ on:
       - apps/test-suite/**
       - packages/**
       - yarn.lock
-      # When adding new paths, also update the paths of the "Get the base commit" step below
+      - '!packages/@expo/cli/**'
+      - '!**.md'
+      - '!**/__tests__/**'
+      - '!**/__mocks__/**'
   pull_request:
     paths:
       - .github/workflows/test-suite.yml
@@ -20,24 +23,28 @@ on:
       - apps/test-suite/**
       - packages/**
       - yarn.lock
-      # Ignore Expo CLI for now...
       - '!packages/@expo/cli/**'
+      - '!**.md'
+      - '!**/__tests__/**'
+      - '!**/__mocks__/**'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  detect-platform-for-e2e:
+  detect-platform-changes:
     runs-on: ubuntu-24.04
     outputs:
-      should_run_ios: ${{ steps.changes.outputs.should_run_ios }}
-      should_run_android: ${{ steps.changes.outputs.should_run_android }}
+      should_build_ios: ${{ steps.build.outputs.should_run_ios }}
+      should_build_android: ${{ steps.build.outputs.should_run_android }}
+      should_test_ios: ${{ steps.e2e.outputs.should_run_ios }}
+      should_test_android: ${{ steps.e2e.outputs.should_run_android }}
     steps:
       - name: 👀 Checkout
         uses: actions/checkout@v5
-      - name: 🧐 Detect platform change
-        id: changes
+      - name: 🧐 Detect build-relevant platform changes
+        id: build
         uses: ./.github/actions/detect-platform-change
         with:
           android-paths: >-
@@ -57,10 +64,68 @@ jobs:
             yarn.lock,
             "!packages/**/{ios,android}/**",
             "!apps/bare-expo/**/{ios,android}/**"
+
+      - name: 🧐 Detect e2e-test relevant platform changes
+        id: e2e
+        uses: ./.github/actions/detect-platform-change
+        with:
+          android-paths: >-
+            "packages/expo-modules-core/**/android/**",
+            "packages/expo-modules-autolinking/**/android/**",
+            "packages/expo/**/android/**",
+            "packages/expo-constants/**/android/**",
+            "packages/expo-crypto/**/android/**",
+            "packages/expo-file-system/**/android/**",
+            "packages/expo-haptics/**/android/**",
+            "packages/expo-image/**/android/**",
+            "packages/expo-keep-awake/**/android/**",
+            "packages/expo-linear-gradient/**/android/**",
+            "packages/expo-localization/**/android/**",
+            "packages/expo-sqlite/**/android/**",
+            "packages/expo-video/**/android/**",
+            "apps/bare-expo/**/android/**"
+
+          ios-paths: >-
+            "packages/expo-modules-core/**/ios/**",
+            "packages/expo-modules-autolinking/**/ios/**",
+            "packages/expo/**/ios/**",
+            "packages/expo-constants/**/ios/**",
+            "packages/expo-crypto/**/ios/**",
+            "packages/expo-file-system/**/ios/**",
+            "packages/expo-haptics/**/ios/**",
+            "packages/expo-image/**/ios/**",
+            "packages/expo-keep-awake/**/ios/**",
+            "packages/expo-linear-gradient/**/ios/**",
+            "packages/expo-localization/**/ios/**",
+            "packages/expo-sqlite/**/ios/**",
+            "packages/expo-video/**/ios/**",
+            "apps/bare-expo/**/ios/**"
+
+          common-paths: >-
+            .github/workflows/test-suite.yml,
+            .github/actions/use-android-emulator/action.yml,
+            "apps/bare-expo/**",
+            "apps/test-suite/**",
+            "packages/expo-modules-core/**",
+            "packages/expo-modules-autolinking/**",
+            "packages/expo/**",
+            "packages/expo-constants/**",
+            "packages/expo-crypto/**",
+            "packages/expo-file-system/**",
+            "packages/expo-haptics/**",
+            "packages/expo-image/**",
+            "packages/expo-keep-awake/**",
+            "packages/expo-linear-gradient/**",
+            "packages/expo-localization/**",
+            "packages/expo-sqlite/**",
+            "packages/expo-video/**",
+            yarn.lock,
+            "!packages/**/{ios,android}/**",
+            "!apps/bare-expo/**/{ios,android}/**"
   ios-build:
     runs-on: macos-15
-    needs: detect-platform-for-e2e
-    if: needs.detect-platform-for-e2e.outputs.should_run_ios == 'true'
+    needs: detect-platform-changes
+    if: needs.detect-platform-changes.outputs.should_build_ios == 'true'
     permissions:
       # REQUIRED: Allow updating fingerprint in action caches
       actions: write
@@ -147,7 +212,8 @@ jobs:
           author_name: Test Suite e2e (iOS)
 
   ios-test-e2e:
-    needs: ios-build
+    needs: [ios-build, detect-platform-changes]
+    if: needs.detect-platform-changes.outputs.should_test_ios == 'true'
     runs-on: macos-15
     steps:
       - name: 👀 Checkout
@@ -248,8 +314,8 @@ jobs:
 
   android-build:
     runs-on: ubuntu-24.04
-    needs: detect-platform-for-e2e
-    if: needs.detect-platform-for-e2e.outputs.should_run_android == 'true'
+    needs: detect-platform-changes
+    if: needs.detect-platform-changes.outputs.should_build_android == 'true'
     permissions:
       # REQUIRED: Allow updating fingerprint in action caches
       actions: write
@@ -333,7 +399,8 @@ jobs:
           author_name: Test Suite e2e (Android)
 
   android-test-e2e:
-    needs: android-build
+    needs: [android-build, detect-platform-changes]
+    if: needs.detect-platform-changes.outputs.should_test_android == 'true'
     runs-on: ubuntu-24.04
     strategy:
       matrix:
