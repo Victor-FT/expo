@@ -17,6 +17,8 @@
 
 ### 💡 Others
 
+- [Android] migrate several Java files to Kotlin ([#43249](https://github.com/expo/expo/pull/43249) by [@vonovak](https://github.com/vonovak))
+
 ## 55.0.7 — 2026-02-16
 
 ### 💡 Others
