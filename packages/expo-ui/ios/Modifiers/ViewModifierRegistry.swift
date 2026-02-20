@@ -121,10 +121,11 @@ internal struct OpacityModifier: ViewModifier, Record {
 }
 
 internal struct ScaleEffectModifier: ViewModifier, Record {
-  @Field var scale: CGFloat = 1.0
+  @Field var x: CGFloat = 1.0
+  @Field var y: CGFloat = 1.0
 
   func body(content: Content) -> some View {
-    content.scaleEffect(scale)
+    content.scaleEffect(x: x, y: y)
   }
 }
 
