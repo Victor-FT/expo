@@ -38,7 +38,7 @@
     "react": "*",
     "react-dom": "*",
     "expo": "*",
-    "expo-constants": "^55.0.5",
+    "expo-constants": "^55.0.6",
     "expo-font": "^55.0.4",
     "expo-router": "*",
     "expo-server": "^55.0.4",

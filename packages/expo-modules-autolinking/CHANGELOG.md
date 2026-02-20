@@ -10,6 +10,10 @@
 
 ### 💡 Others
 
+## 55.0.6 — 2026-02-20
+
+### 💡 Others
+
 - Reduce memory retained after autolinking runs ([#42947](https://github.com/expo/expo/pull/42947) by [@kitten](https://github.com/kitten))
 - Add concurrency limits to IO-bound autolinking tasks ([#42968](https://github.com/expo/expo/pull/42968) by [@kitten](https://github.com/kitten))
 

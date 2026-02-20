@@ -8,6 +8,12 @@
 
 ### 🐛 Bug fixes
 
+### 💡 Others
+
+## 55.0.7 — 2026-02-20
+
+### 🐛 Bug fixes
+
 - [Web] Fix potential `nan` duration. ([#43268](https://github.com/expo/expo/pull/43268) by [@alanjhughes](https://github.com/alanjhughes))
 
 ### 💡 Others
