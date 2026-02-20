@@ -64,6 +64,7 @@
     "expo-module-scripts": "^55.0.2"
   },
   "peerDependencies": {
-    "expo": "*"
+    "expo": "*",
+    "react": "*"
   }
 }
