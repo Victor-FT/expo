@@ -27,7 +27,7 @@ export const selectPackagesToPromote = new Task<TaskArgs>(
 
     logger.info('\n👉 Selecting packages to promote...\n');
 
-    const packageNames = await promptForPackagesToPromoteAsync(parcels);
+    const packageNames = await promptForPackagesToPromoteAsync(parcels, options.half);
     const newParcels = parcels.filter(({ pkg }) => packageNames.includes(pkg.packageName));
 
     return [newParcels, options];
@@ -37,10 +37,29 @@ export const selectPackagesToPromote = new Task<TaskArgs>(
 /**
  * Prompts the user to select packages to promote or demote.
  */
-async function promptForPackagesToPromoteAsync(parcels: Parcel[]): Promise<string[]> {
-  const maxLength = parcels.reduce((acc, { pkg }) => Math.max(acc, pkg.packageName.length), 0);
-  const choices = parcels.map(({ pkg, state }) => {
+async function promptForPackagesToPromoteAsync(
+  parcels: Parcel[],
+  half?: 1 | 2
+): Promise<string[]> {
+  // Sort parcels alphabetically by package name.
+  const sorted = [...parcels].sort((a, b) => a.pkg.packageName.localeCompare(b.pkg.packageName));
+
+  const maxLength = sorted.reduce((acc, { pkg }) => Math.max(acc, pkg.packageName.length), 0);
+  const midpoint = Math.ceil(sorted.length / 2);
+
+  const choices = sorted.map(({ pkg, state }, index) => {
     const action = state.isDemoting ? red.bold('demote') : green.bold('promote');
+
+    let checked: boolean;
+    if (state.isDemoting) {
+      checked = false;
+    } else if (half === 1) {
+      checked = index < midpoint;
+    } else if (half === 2) {
+      checked = index >= midpoint;
+    } else {
+      checked = true;
+    }
 
     return {
       name: `${green(pkg.packageName.padEnd(maxLength))} ${action} ${formatVersionChange(
@@ -48,7 +67,7 @@ async function promptForPackagesToPromoteAsync(parcels: Parcel[]): Promise<strin
         pkg.packageVersion
       )}`,
       value: pkg.packageName,
-      checked: !state.isDemoting,
+      checked,
     };
   });
   const { selectedPackageNames } = await inquirer.prompt([
@@ -57,8 +76,7 @@ async function promptForPackagesToPromoteAsync(parcels: Parcel[]): Promise<strin
       name: 'selectedPackageNames',
       message: 'Which packages do you want to promote?\n  ● selected ○ unselected\n',
       choices: [
-        // Choices unchecked by default (these being demoted) should be on top.
-        // We could sort them, but JS sorting algorithm is unstable :/
+        // Choices unchecked by default (demoting or unselected half) should be on top.
         ...choices.filter((choice) => !choice.checked),
         ...choices.filter((choice) => choice.checked),
       ],

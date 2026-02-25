@@ -40,6 +40,17 @@ export default (program: Command) => {
       'Lists packages with unpublished changes since the previous version.',
       false
     )
+    .option(
+      '--half <number>',
+      'Auto-select the first (1) or second (2) half of the alphabetically sorted package list.',
+      (value) => {
+        const n = parseInt(value, 10);
+        if (n !== 1 && n !== 2) {
+          throw new Error('--half must be 1 or 2');
+        }
+        return n as 1 | 2;
+      }
+    )
 
     /* debug */
     .option('-D, --dry', 'Whether to skip `npm dist-tag add` command.', false)
