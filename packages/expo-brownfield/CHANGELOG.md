@@ -10,6 +10,10 @@
 
 ### 💡 Others
 
+## 55.0.11 — 2026-02-25
+
+### 💡 Others
+
 - [test] run brownfield e2e tests (cli + plugin) in sdk/check-packages workflow ([#43391](https://github.com/expo/expo/pull/43391) by [@pmleczek](https://github.com/pmleczek))
 
 ## 55.0.10 — 2026-02-25

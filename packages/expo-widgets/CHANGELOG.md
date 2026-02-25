@@ -8,10 +8,14 @@
 
 ### 🐛 Bug fixes
 
+### 💡 Others
+
+## 55.0.1 — 2026-02-25
+
+### 🐛 Bug fixes
+
 - Fix "blinking" on interactions. ([#43416](https://github.com/expo/expo/pull/43416) by [@jakex7](https://github.com/jakex7))
 - Generate WidgetBundle for live activity even when there are no widgets. ([#43425](https://github.com/expo/expo/pull/43425) by [@jakex7](https://github.com/jakex7))
-
-### 💡 Others
 
 ## 55.0.0 — 2026-02-25
 
