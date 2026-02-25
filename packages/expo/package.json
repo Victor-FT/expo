@@ -1,6 +1,6 @@
 {
   "name": "expo",
-  "version": "55.0.1",
+  "version": "55.0.2",
   "description": "The Expo SDK",
   "main": "src/Expo.ts",
   "module": "src/Expo.ts",
