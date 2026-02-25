@@ -13,6 +13,7 @@ export type CommandOptions = {
   dry: boolean;
   list: boolean;
   reverse?: boolean;
+  promptOtp?: boolean;
 };
 
 /**

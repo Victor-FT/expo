@@ -5,6 +5,7 @@ import { prepareParcels } from './prepareParcels';
 import { selectPackagesToPromote } from './selectPackagesToPromote';
 import logger from '../../Logger';
 import * as Npm from '../../Npm';
+import { promptOtp, withOtpRetry } from '../../NpmOtp';
 import { Task } from '../../TasksRunner';
 import { formatVersionChange } from '../helpers';
 import { CommandOptions, Parcel, TaskArgs } from '../types';
@@ -30,9 +31,10 @@ export const promotePackages = new Task<TaskArgs>(
       sorted.reverse();
     }
 
-    // check if two factor auth is required for publishing
-    const npmProfile = await Npm.getProfileAsync();
-    const requiresOTP = npmProfile?.tfa?.mode === 'auth-and-writes';
+    // Prompt for OTP up front if requested; sets env var read by Npm.addTagAsync/removeTagAsync.
+    if (options.promptOtp) {
+      process.env.NPM_OTP = await promptOtp();
+    }
 
     for (const { pkg, state } of sorted) {
       const currentVersion = pkg.packageVersion;
@@ -49,28 +51,9 @@ export const promotePackages = new Task<TaskArgs>(
 
       // Tag the local version of the package.
       if (!options.dry) {
-        await Npm.addTagAsync(pkg.packageName, pkg.packageVersion, options.tag, {
-          stdio: requiresOTP ? 'inherit' : undefined,
-        });
-      }
-
-      // If the local version had any tags assigned, we can drop the old ones.
-      // If assigning `sdk-` tag, don't drop any other tags. This one is additive.
-      if (
-        options.drop &&
-        state.distTags &&
-        !state.distTags.includes(options.tag) &&
-        !options.tag.startsWith('sdk-')
-      ) {
-        for (const distTag of state.distTags) {
-          logger.log('    ', `Dropping ${yellow(distTag)} tag (${cyan(currentVersion)})...`);
-
-          if (!options.dry) {
-            await Npm.removeTagAsync(pkg.packageName, distTag, {
-              stdio: requiresOTP ? 'inherit' : undefined,
-            });
-          }
-        }
+        await withOtpRetry(() =>
+          Npm.addTagAsync(pkg.packageName, pkg.packageVersion, options.tag)
+        );
       }
     }
 
