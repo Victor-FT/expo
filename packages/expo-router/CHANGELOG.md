@@ -6,6 +6,8 @@
 
 ### 🎉 New features
 
+- [ios] support custom images in submenus ([#43414](https://github.com/expo/expo/pull/43414) by [@Ubax](https://github.com/Ubax))
+
 ### 🐛 Bug fixes
 
 - [ios] add better modal and preview handling when using zoom transition ([#43370](https://github.com/expo/expo/pull/43370) by [@Ubax](https://github.com/Ubax))
