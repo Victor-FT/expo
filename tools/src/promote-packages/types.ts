@@ -12,7 +12,7 @@ export type CommandOptions = {
   demote: boolean;
   dry: boolean;
   list: boolean;
-  half?: 1 | 2;
+  reverse?: boolean;
 };
 
 /**

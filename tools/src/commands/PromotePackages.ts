@@ -41,15 +41,9 @@ export default (program: Command) => {
       false
     )
     .option(
-      '--half <number>',
-      'Auto-select the first (1) or second (2) half of the alphabetically sorted package list.',
-      (value) => {
-        const n = parseInt(value, 10);
-        if (n !== 1 && n !== 2) {
-          throw new Error('--half must be 1 or 2');
-        }
-        return n as 1 | 2;
-      }
+      '-r, --reverse',
+      'Promote packages in reverse alphabetical order (Z to A).',
+      false
     )
 
     /* debug */

@@ -22,53 +22,57 @@ export const promotePackages = new Task<TaskArgs>(
   async (parcels: Parcel[], options: CommandOptions): Promise<void> => {
     logger.info(`\n🚀 Promoting packages to ${yellow.bold(options.tag)} tag...`);
 
-    await Promise.all(
-      parcels.map(async ({ pkg, state }) => {
-        const currentVersion = pkg.packageVersion;
-        const { versionToReplace } = state;
+    // Sort alphabetically, optionally reversed.
+    const sorted = [...parcels].sort((a, b) =>
+      a.pkg.packageName.localeCompare(b.pkg.packageName)
+    );
+    if (options.reverse) {
+      sorted.reverse();
+    }
 
-        const batch = logger.batch();
-        const action = state.isDemoting ? red('Demoting') : green('Promoting');
-        batch.log('  ', green.bold(pkg.packageName));
-        batch.log(
-          '    ',
-          action,
-          yellow(options.tag),
-          formatVersionChange(versionToReplace, currentVersion)
-        );
+    // check if two factor auth is required for publishing
+    const npmProfile = await Npm.getProfileAsync();
+    const requiresOTP = npmProfile?.tfa?.mode === 'auth-and-writes';
 
-        // check if two factor auth is required for publishing
-        const npmProfile = await Npm.getProfileAsync();
-        const requiresOTP = npmProfile?.tfa?.mode === 'auth-and-writes';
+    for (const { pkg, state } of sorted) {
+      const currentVersion = pkg.packageVersion;
+      const { versionToReplace } = state;
 
-        // Tag the local version of the package.
-        if (!options.dry) {
-          await Npm.addTagAsync(pkg.packageName, pkg.packageVersion, options.tag, {
-            stdio: requiresOTP ? 'inherit' : undefined,
-          });
-        }
+      const action = state.isDemoting ? red('Demoting') : green('Promoting');
+      logger.log('  ', green.bold(pkg.packageName));
+      logger.log(
+        '    ',
+        action,
+        yellow(options.tag),
+        formatVersionChange(versionToReplace, currentVersion)
+      );
 
-        // If the local version had any tags assigned, we can drop the old ones.
-        // If assigning `sdk-` tag, don't drop any other tags. This one is additive.
-        if (
-          options.drop &&
-          state.distTags &&
-          !state.distTags.includes(options.tag) &&
-          !options.tag.startsWith('sdk-')
-        ) {
-          for (const distTag of state.distTags) {
-            batch.log('    ', `Dropping ${yellow(distTag)} tag (${cyan(currentVersion)})...`);
+      // Tag the local version of the package.
+      if (!options.dry) {
+        await Npm.addTagAsync(pkg.packageName, pkg.packageVersion, options.tag, {
+          stdio: requiresOTP ? 'inherit' : undefined,
+        });
+      }
 
-            if (!options.dry) {
-              await Npm.removeTagAsync(pkg.packageName, distTag, {
-                stdio: requiresOTP ? 'inherit' : undefined,
-              });
-            }
+      // If the local version had any tags assigned, we can drop the old ones.
+      // If assigning `sdk-` tag, don't drop any other tags. This one is additive.
+      if (
+        options.drop &&
+        state.distTags &&
+        !state.distTags.includes(options.tag) &&
+        !options.tag.startsWith('sdk-')
+      ) {
+        for (const distTag of state.distTags) {
+          logger.log('    ', `Dropping ${yellow(distTag)} tag (${cyan(currentVersion)})...`);
+
+          if (!options.dry) {
+            await Npm.removeTagAsync(pkg.packageName, distTag, {
+              stdio: requiresOTP ? 'inherit' : undefined,
+            });
           }
         }
-        batch.flush();
-      })
-    );
+      }
+    }
 
     logger.success(`\n✅ Successfully promoted ${cyan(parcels.length + '')} packages.`);
   }
