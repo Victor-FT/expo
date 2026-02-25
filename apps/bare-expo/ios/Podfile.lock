@@ -429,7 +429,7 @@ PODS:
     - ExpoModulesCore
   - ExpoLinearGradient (55.0.8):
     - ExpoModulesCore
-  - ExpoLinking (55.0.6):
+  - ExpoLinking (55.0.7):
     - ExpoModulesCore
   - ExpoLivePhoto (55.0.8):
     - ExpoModulesCore
@@ -582,7 +582,7 @@ PODS:
     - UMAppLoader
   - ExpoTrackingTransparency (55.0.8):
     - ExpoModulesCore
-  - ExpoUI (55.0.0-beta.0):
+  - ExpoUI (55.0.0):
     - ExpoModulesCore
     - React-RCTFabric
   - ExpoVideo (55.0.9):
@@ -3846,7 +3846,7 @@ SPEC CHECKSUMS:
   ExpoInsights: 838105a63a07a971de89a6b72c195038361e2662
   ExpoKeepAwake: 55711a70fe88a41e793bbe28543c93cb47ff265d
   ExpoLinearGradient: 311546b2af6dadb591035cbe41b59884ea492377
-  ExpoLinking: 11cf995e55ad7aea108f64196135d1ee9c4ee389
+  ExpoLinking: 31827b9e0d27d058026a87a0e852f238c5834804
   ExpoLivePhoto: 5416c5d079c44b4b343cf35f5ff5362a46391b34
   ExpoLocalAuthentication: ccc92a75fd11b83b1e321074a803ba7dd90bead1
   ExpoLocalization: ce989b8e6b86ff38698f8ee8e897b9a2e85d46d2
@@ -3877,7 +3877,7 @@ SPEC CHECKSUMS:
   ExpoSystemUI: c4c5b9ba9a5a4713c70f3d68c3bcf3221f2198f2
   ExpoTaskManager: 1a197d3c489d5ed7ae824f7d6b98404e3a662ff2
   ExpoTrackingTransparency: a45cd07cbab513b38c44a146f522aefbf4f6dfdf
-  ExpoUI: ca0d282fc63a9c800c96a90d015877789b46efd3
+  ExpoUI: 93c458a971e6d7320a7e09c5a052f06e47fe9a11
   ExpoVideo: 570228bc29b15071627f295afa1407ea3d196934
   ExpoVideoThumbnails: 7e5f6bddec993b7930b41fd47646a27e4f8133e9
   ExpoWebBrowser: 19c5d250e0c101027677970a5f2fc635d9df2e73
