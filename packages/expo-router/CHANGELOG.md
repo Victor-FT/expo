@@ -10,6 +10,7 @@
 
 ### 🐛 Bug fixes
 
+- [android] Fix `Color.android.dynamic.background` always returning null by adding missing `background` mapping to `attrMap`. ([#43336](https://github.com/expo/expo/pull/43336) by [@just1and0](https://github.com/just1and0))
 - [ios] add better modal and preview handling when using zoom transition ([#43370](https://github.com/expo/expo/pull/43370) by [@Ubax](https://github.com/Ubax))
 
 ### 💡 Others
