@@ -14,6 +14,8 @@
 
 ### 💡 Others
 
+- [iOS] Improved conversions of returned arrays and dictionaries with mixed element types. ([#42641](https://github.com/expo/expo/pull/42641) by [@barthap](https://github.com/barthap))
+
 ## 55.0.12 — 2026-02-25
 
 _This version does not introduce any user-facing changes._
